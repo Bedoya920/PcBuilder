@@ -22,7 +22,7 @@ namespace PcComponents
         }
     }
 
-    public class Grafica
+    public class Grafica 
     {
         private string name;
         private GameObject goGrafica;
