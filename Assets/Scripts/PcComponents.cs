@@ -8,7 +8,7 @@ namespace PcComponents
     {
         private string name;
         private GameObject goProcesador;
-        private Vector3 pos = new Vector3(0,0,0);
+        private Vector3 pos = new Vector3(0,1,0);
 
         public Procesador(string n) 
         { 
@@ -26,7 +26,7 @@ namespace PcComponents
     {
         private string name;
         private GameObject goGrafica;
-        private Vector3 pos = new Vector3(0,0,0);
+        private Vector3 pos = new Vector3(0,0.2f,0);
 
         public Grafica(string n) 
         { 
