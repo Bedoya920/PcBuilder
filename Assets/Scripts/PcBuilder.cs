@@ -14,11 +14,11 @@ namespace PcBuilder
 
     public class PcDirector
     {
-        public PC BuildPC(PcBuilderBase builder)
+        public PC BuildPC(PcBuilderBase builder, string proces, string graf)
         {
             builder.Reset();
-            builder.SetProcesador();
-            builder.SetGrafica();
+            builder.SetProcesador(proces);
+            builder.SetGrafica(graf);
             return builder.GetResult();
         }
     }
@@ -29,14 +29,14 @@ namespace PcBuilder
         public void Reset() => pc = new PC();
         public PC GetResult() => pc;
         
-        public abstract void SetProcesador();
-        public abstract void SetGrafica();
+        public abstract void SetProcesador(string tipo);
+        public abstract void SetGrafica(string tipo);
     }
 
-    public class BajaPCBuilder : PcBuilderBase
+    public class CustomPCBuilder : PcBuilderBase
     {
-        public override void SetProcesador() => pc.Procesador = new Procesador("ProcesadorBaja");
-        public override void SetGrafica() => pc.Grafica = new Grafica("GraficaBaja");
+        public override void SetProcesador(string tipo) => pc.Procesador = new Procesador(tipo);
+        public override void SetGrafica(string tipo) => pc.Grafica = new Grafica(tipo);
     
     }
 }
