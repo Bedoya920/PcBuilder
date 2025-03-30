@@ -7,11 +7,13 @@ public class Main : MonoBehaviour
 {
     PcDirector director = new PcDirector();
     PcBuilderBase builderBaja = new CustomPCBuilder();
+
+    public Transform pos;
     
 
     void Start()
     {
-        PC pcBaja = director.BuildPC(builderBaja, "ProcesadorBaja", "GraficaBaja");
+        
         
     }
 

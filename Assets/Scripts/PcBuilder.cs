@@ -7,18 +7,24 @@ namespace PcBuilder
 {
     public class PC
     {
-        public Procesador Procesador { get; set; }
-        public Grafica Grafica { get; set; }
+        public Chasis Chasis { get; set; }
+        public Pantalla Pantalla { get; set; }
+
+        public void DestroyComponents()
+        {
+            Chasis?.Destroy();
+            Pantalla?.Destroy();
+        }
 
     }
 
     public class PcDirector
     {
-        public PC BuildPC(PcBuilderBase builder, string proces, string graf)
+        public PC BuildPC(PcBuilderBase builder, string chasis, string pantalla, Transform posChasis, Transform posPantalla)
         {
             builder.Reset();
-            builder.SetProcesador(proces);
-            builder.SetGrafica(graf);
+            builder.SetChasis(chasis, posChasis);
+            builder.SetPantalla(pantalla, posPantalla);
             return builder.GetResult();
         }
     }
@@ -26,17 +32,24 @@ namespace PcBuilder
     public abstract class PcBuilderBase 
     {
         protected PC pc;
-        public void Reset() => pc = new PC();
-        public PC GetResult() => pc;
+        public void Reset()
+        {
+            if(pc != null)
+            {
+                pc.DestroyComponents();
+            }
+            pc = new PC();
+        } 
         
-        public abstract void SetProcesador(string tipo);
-        public abstract void SetGrafica(string tipo);
+        public PC GetResult() => pc;
+        public abstract void SetChasis(string tipo, Transform pos);
+        public abstract void SetPantalla(string tipo, Transform pos);
     }
 
     public class CustomPCBuilder : PcBuilderBase
     {
-        public override void SetProcesador(string tipo) => pc.Procesador = new Procesador(tipo);
-        public override void SetGrafica(string tipo) => pc.Grafica = new Grafica(tipo);
+        public override void SetChasis(string tipo, Transform pos) => pc.Chasis = new Chasis(tipo, pos);
+        public override void SetPantalla(string tipo, Transform pos) => pc.Pantalla = new Pantalla(tipo, pos);
     
     }
 }
