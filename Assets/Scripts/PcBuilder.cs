@@ -40,10 +40,9 @@ namespace PcBuilder
             }
             pc = new PC();
         } 
-        
-        public PC GetResult() => pc;
         public abstract void SetChasis(string tipo, Transform pos);
         public abstract void SetPantalla(string tipo, Transform pos);
+        public PC GetResult() => pc;
     }
 
     public class CustomPCBuilder : PcBuilderBase
@@ -52,4 +51,5 @@ namespace PcBuilder
         public override void SetPantalla(string tipo, Transform pos) => pc.Pantalla = new Pantalla(tipo, pos);
     
     }
+
 }
