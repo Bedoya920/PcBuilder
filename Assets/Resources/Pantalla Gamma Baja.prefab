@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1751821901488134361}
   m_Layer: 0
-  m_Name: B_GamaBaja_Baja
+  m_Name: Pantalla Gamma Baja
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
