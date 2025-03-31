@@ -4,40 +4,59 @@ using UnityEngine;
 
 namespace PcComponents 
 {
-    public class Procesador
+    public class Chasis
     {
         private string name;
-        private GameObject goProcesador;
-        private Vector3 pos = new Vector3(0,1,0);
+        private GameObject goChasis;
+        internal GameObject ins;
 
-        public Procesador(string n) 
+        public Chasis(string n, Transform pos) 
         { 
             name = n; 
-            goProcesador = Resources.Load<GameObject>(n);
+            goChasis = Resources.Load<GameObject>(n);
 
-            if (goProcesador != null)
+            if (goChasis != null)
             {
-                GameObject.Instantiate(goProcesador, pos, Quaternion.identity);
+                ins = GameObject.Instantiate(goChasis, pos.position, pos.rotation);
+            } else {
+                Debug.LogError("Aja y el prefab que papi?");
+            }
+        }
+
+        public void Destroy()
+        {
+            if (ins != null)
+            {
+                GameObject.Destroy(ins);
             }
         }
     }
 
-    public class Grafica 
+    public class Pantalla 
     {
         private string name;
-        private GameObject goGrafica;
-        private Vector3 pos = new Vector3(0,0.2f,0);
+        private GameObject goPantalla;
+        internal GameObject ins;
+        
 
-        public Grafica(string n) 
+        public Pantalla(string n, Transform pos) 
         { 
             name = n; 
-            goGrafica = Resources.Load<GameObject>(n);
+            goPantalla = Resources.Load<GameObject>(n);
 
-            if (goGrafica != null)
+            if (goPantalla != null)
             {
-                GameObject.Instantiate(goGrafica, pos, Quaternion.identity);
+                ins = GameObject.Instantiate(goPantalla, pos.position, pos.rotation);
             } else {
                 Debug.LogError("Aja y el prefab que papi?");
+            }
+        }
+
+        public void Destroy()
+        {
+            if (ins != null)
+            {
+                GameObject.Destroy(ins);
             }
         }
     }

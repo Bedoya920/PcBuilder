@@ -1,49 +1,74 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;               
 using UnityEngine.UI;
 using PcBuilder;
 
 public class PCStoreUI : MonoBehaviour
 {
-    // Referencias a los componentes UI creados en el Canvas
-    public Dropdown procesadorDropdown;
-    public Dropdown graficaDropdown;
-    public Button construirButton;
+    // UI
+    public TMP_Dropdown chasisDropdown;
+    public TMP_Dropdown pantallaDropdown;
+    public Button crearPCButton;
 
-    // Director y builder del patrón
+    //Builder
     private PcDirector director;
     private PcBuilderBase builder;
 
+    [SerializeField] private Transform posChasis;
+    [SerializeField] private Transform posPantalla;
+
+    [SerializeField] private AudioSource compraSfx;
+
     void Start()
     {
-        // Inicializamos el director y el builder (usa el builder que implementa tus componentes)
         director = new PcDirector();
         builder = new CustomPCBuilder();
 
-        // Configurar los Dropdowns con las opciones disponibles
-        // Estas opciones deben corresponder con los nombres de los prefabs en Resources.
-        List<string> opcionesProcesador = new List<string> { "ProcesadorBaja", "ProcesadorMedia", "ProcesadorAlta" };
-        List<string> opcionesGrafica = new List<string> { "GraficaBaja", "GraficaMedia", "GraficaAlta" };
+        // Configurar los TMP_Dropdown con las opciones disponibles.
+        // La primera opciï¿½n es un placeholder para forzar la selecciï¿½n.
+        List<string> opcionesChasis = new List<string> { "Selecciona Chasis", "Chasis Gamma Baja", "Chasis Gamma Media", "Chasis Gamma Alta" };
+        List<string> opcionesPantalla = new List<string> { "Selecciona Pantalla", "Pantalla Gamma Baja", "Pantalla Gamma Media", "Pantalla Gamma Alta" };
 
-        procesadorDropdown.ClearOptions();
-        procesadorDropdown.AddOptions(opcionesProcesador);
+        chasisDropdown.ClearOptions();
+        chasisDropdown.AddOptions(opcionesChasis);
 
-        graficaDropdown.ClearOptions();
-        graficaDropdown.AddOptions(opcionesGrafica);
+        pantallaDropdown.ClearOptions();
+        pantallaDropdown.AddOptions(opcionesPantalla);
 
-        // Asociar la acción del botón para construir el PC
-        construirButton.onClick.AddListener(ConstruirPC);
+        // Agregar listeners para detectar cambios en los dropdown y verificar que se hayan seleccionado opciones vï¿½lidas.
+        chasisDropdown.onValueChanged.AddListener(delegate { CheckDropdownSelections(); });
+        pantallaDropdown.onValueChanged.AddListener(delegate { CheckDropdownSelections(); });
+
+        // Inicialmente, el botï¿½n de crear PC se oculta hasta que se marquen ambas opciones.
+        crearPCButton.gameObject.SetActive(false);
+
+        // Asociar la acciï¿½n del botï¿½n para construir el PC.
+        crearPCButton.onClick.AddListener(ConstruirPC);
     }
 
-    // Método que se ejecuta al presionar el botón
+    // Verifica si ambos dropdowns tienen una opciï¿½n vï¿½lida seleccionada (ï¿½ndice mayor a 0).
+    void CheckDropdownSelections()
+    {
+        if (chasisDropdown.value > 0 && pantallaDropdown.value > 0)
+        {
+            crearPCButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            crearPCButton.gameObject.SetActive(false);
+        }
+    }
+
+    // Se ejecuta al presionar el botï¿½n para construir el PC.
     void ConstruirPC()
     {
-        // Obtener las selecciones actuales de los Dropdowns
-        string procesadorSeleccionado = procesadorDropdown.options[procesadorDropdown.value].text;
-        string graficaSeleccionada = graficaDropdown.options[graficaDropdown.value].text;
+        string chasisSeleccionado = chasisDropdown.options[chasisDropdown.value].text;
+        string pantallaSeleccionada = pantallaDropdown.options[pantallaDropdown.value].text;
 
-        // Usar el director para construir el PC con las especificaciones seleccionadas
-        PC pc = director.BuildPC(builder, procesadorSeleccionado, graficaSeleccionada);
-        Debug.Log("PC construido: " + procesadorSeleccionado + " y " + graficaSeleccionada);
+        // Usar el director para construir el PC con las especificaciones seleccionadas.
+        PC pc = director.BuildPC(builder, chasisSeleccionado, pantallaSeleccionada, posChasis, posPantalla);
+        compraSfx.Play();
+        Debug.Log("PC construido: " + chasisSeleccionado + " y " + pantallaSeleccionada);
     }
 }
