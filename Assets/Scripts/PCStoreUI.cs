@@ -1,32 +1,35 @@
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;               
+using TMPro;               // Usamos TextMesh Pro para los dropdowns
 using UnityEngine.UI;
 using PcBuilder;
 
 public class PCStoreUI : MonoBehaviour
 {
-    // UI
+    // Referencias a los elementos de la UI (dropdowns y botón)
     public TMP_Dropdown chasisDropdown;
     public TMP_Dropdown pantallaDropdown;
     public Button crearPCButton;
 
-    //Builder
+    // Variables del patrón Builder
     private PcDirector director;
     private PcBuilderBase builder;
 
+    // Posiciones donde se instanciarán los componentes en la escena
     [SerializeField] private Transform posChasis;
     [SerializeField] private Transform posPantalla;
 
+    // Audio de confirmación de compra
     [SerializeField] private AudioSource compraSfx;
 
     void Start()
     {
+        // Inicializamos el director y el builder
         director = new PcDirector();
         builder = new CustomPCBuilder();
 
-        // Configurar los TMP_Dropdown con las opciones disponibles.
-        // La primera opci�n es un placeholder para forzar la selecci�n.
+        // Configuración de las opciones de los dropdowns
+        // El primer elemento es un placeholder para forzar una selección válida.
         List<string> opcionesChasis = new List<string> { "Selecciona Chasis", "Chasis Gamma Baja", "Chasis Gamma Media", "Chasis Gamma Alta" };
         List<string> opcionesPantalla = new List<string> { "Selecciona Pantalla", "Pantalla Gamma Baja", "Pantalla Gamma Media", "Pantalla Gamma Alta" };
 
@@ -36,18 +39,18 @@ public class PCStoreUI : MonoBehaviour
         pantallaDropdown.ClearOptions();
         pantallaDropdown.AddOptions(opcionesPantalla);
 
-        // Agregar listeners para detectar cambios en los dropdown y verificar que se hayan seleccionado opciones v�lidas.
+        // Se agregan listeners para detectar cambios en las opciones y mostrar/ocultar el botón
         chasisDropdown.onValueChanged.AddListener(delegate { CheckDropdownSelections(); });
         pantallaDropdown.onValueChanged.AddListener(delegate { CheckDropdownSelections(); });
 
-        // Inicialmente, el bot�n de crear PC se oculta hasta que se marquen ambas opciones.
+        // Ocultamos el botón hasta que se seleccionen opciones válidas
         crearPCButton.gameObject.SetActive(false);
 
-        // Asociar la acci�n del bot�n para construir el PC.
+        // Asociamos la acción de crear el PC al botón
         crearPCButton.onClick.AddListener(ConstruirPC);
     }
 
-    // Verifica si ambos dropdowns tienen una opci�n v�lida seleccionada (�ndice mayor a 0).
+    // Comprueba si ambos dropdowns tienen una selección válida (índice mayor a 0)
     void CheckDropdownSelections()
     {
         if (chasisDropdown.value > 0 && pantallaDropdown.value > 0)
@@ -60,14 +63,18 @@ public class PCStoreUI : MonoBehaviour
         }
     }
 
-    // Se ejecuta al presionar el bot�n para construir el PC.
+    // Método que se ejecuta al pulsar el botón para construir el PC
     void ConstruirPC()
     {
+        // Se obtienen las opciones seleccionadas
         string chasisSeleccionado = chasisDropdown.options[chasisDropdown.value].text;
         string pantallaSeleccionada = pantallaDropdown.options[pantallaDropdown.value].text;
 
-        // Usar el director para construir el PC con las especificaciones seleccionadas.
+        // Se utiliza el director del patrón Builder para construir el PC
+        // El director orquesta la llamada a los métodos del builder en el orden correcto
         PC pc = director.BuildPC(builder, chasisSeleccionado, pantallaSeleccionada, posChasis, posPantalla);
+
+        // Reproduce un sonido de confirmación
         compraSfx.Play();
         Debug.Log("PC construido: " + chasisSeleccionado + " y " + pantallaSeleccionada);
     }
