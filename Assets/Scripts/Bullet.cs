@@ -12,7 +12,6 @@ public class Bullet : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
-        print("Hola");
         BulletPool.Instance.ReturnBullet(this.gameObject);
     }
 }
