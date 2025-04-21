@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] private float speed;
+    [SerializeField] private float speed = 10f;
     public int idPlayer;
 
     void Update()
@@ -10,8 +10,8 @@ public class Bullet : MonoBehaviour
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
     }
 
-    void OnTriggerEnter(Collider col)
+    void OnTriggerEnter(Collider other)
     {
-        BulletPool.Instance.ReturnBullet(this.gameObject);
+        BulletPool.Instance.ReturnBullet(gameObject);
     }
 }

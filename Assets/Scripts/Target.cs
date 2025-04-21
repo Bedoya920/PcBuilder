@@ -1,44 +1,40 @@
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class Target : MonoBehaviour
 {
-    int lastPlayer = -1;
+    public int CurrentOwner { get; private set; } = 0;
+    private Renderer rend;
 
-    void OnCollisionEnter(Collision col)
+    private void Awake()
     {
-        int whoHit = col.gameObject.GetComponent<Bullet>().idPlayer;
-        
-        if(lastPlayer != -1)
-        {
-            if(lastPlayer != whoHit)
-            {
-                GameManager.Instance.AddPoint(whoHit);
-                GameManager.Instance.RemovePoint(lastPlayer);
-                ChangeColor(whoHit);
-                lastPlayer = whoHit;
-            } 
+        // Solo corre en objetos de la escena (no en assets/materiales)
+        if (!gameObject.scene.IsValid()) return;
 
-        } else {
-            GameManager.Instance.AddPoint(whoHit);
-            ChangeColor(whoHit);
-            lastPlayer = whoHit;
-        }
-        
+        // 1) Collider trigger
+        var col = GetComponent<Collider>() ?? gameObject.AddComponent<BoxCollider>();
+        col.isTrigger = true;
+
+        // 2) Rigidbody kinematic
+        var rb = GetComponent<Rigidbody>() ?? gameObject.AddComponent<Rigidbody>();
+        rb.isKinematic = true;
+        rb.useGravity = false;
+
+        // 3) Renderer e instanciación de material
+        rend = GetComponent<Renderer>() ?? GetComponentInChildren<Renderer>();
+        if (rend != null)
+            rend.material = new Material(rend.sharedMaterial);
     }
 
-    private void ChangeColor(int id)
+    private void OnTriggerEnter(Collider other)
     {
-        Renderer targetRenderer = this.GetComponent<Renderer>();
-        if (targetRenderer != null)
-        {
-            if (id == 1)
-            {
-                targetRenderer.material.color = Color.blue; 
-            }
-            else if (id == 2)
-            {
-                targetRenderer.material.color = Color.yellow; 
-            }
-        }
+        var b = other.GetComponent<Bullet>();
+        if (b == null) return;
+
+        CurrentOwner = b.idPlayer;
+        if (rend != null)
+            rend.material.color = (CurrentOwner == 1) ? Color.blue : Color.yellow;
+
+        Debug.Log($"{name} now owned by Player {CurrentOwner}");
     }
 }

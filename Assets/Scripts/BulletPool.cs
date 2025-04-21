@@ -12,16 +12,8 @@ public class BulletPool : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
-
+        if (Instance == null) Instance = this;
+        else { Destroy(gameObject); return; }
         InitializePool();
     }
 
@@ -29,9 +21,9 @@ public class BulletPool : MonoBehaviour
     {
         for (int i = 0; i < initialPoolSize; i++)
         {
-            GameObject bullet = Instantiate(bulletPrefab,transform);
-            bullet.SetActive(false);
-            pool.Enqueue(bullet);
+            GameObject b = Instantiate(bulletPrefab, transform);
+            b.SetActive(false);
+            pool.Enqueue(b);
         }
     }
 
@@ -39,29 +31,22 @@ public class BulletPool : MonoBehaviour
     {
         if (pool.Count == 0)
         {
-            GameObject bullet = Instantiate(bulletPrefab);
-            bullet.SetActive(false);
-            pool.Enqueue(bullet);
+            GameObject extra = Instantiate(bulletPrefab);
+            extra.SetActive(false);
+            pool.Enqueue(extra);
         }
 
         GameObject obj = pool.Dequeue();
-        obj.GetComponent<Bullet>().idPlayer = id;
+        var bullet = obj.GetComponent<Bullet>();
+        bullet.idPlayer = id;
         obj.transform.position = spawnPoint.position;
         obj.transform.rotation = spawnPoint.rotation;
         obj.transform.SetParent(null);
 
-        Renderer bulletRenderer = obj.GetComponent<Renderer>();
-        if (bulletRenderer != null)
-        {
-            if (id == 1)
-            {
-                bulletRenderer.material.color = Color.blue; 
-            }
-            else if (id == 2)
-            {
-                bulletRenderer.material.color = Color.yellow; 
-            }
-        }
+        var rend = obj.GetComponent<Renderer>();
+        if (rend != null)
+            rend.material.color = (id == 1) ? Color.blue : Color.yellow;
+
         obj.SetActive(true);
         return obj;
     }
