@@ -4,29 +4,33 @@ using UnityEngine.InputSystem;
 public class PlayerControllerKeyboard : MonoBehaviour
 {
     [Header("Jugador")]
-    [SerializeField, Tooltip("1 = WASD, 2 = Flechas")]
-    private int playerId = 1;
+    [Tooltip("1 = WASD, 2 = Flechas")]
+    [SerializeField] private int playerId = 1;
 
-    [Header("Velocidad de rotación (grados/s)")]
-    [SerializeField] private float yawSpeed   = 90f;
-    [SerializeField] private float pitchSpeed = 90f;
+    [Header("Sensibilidad (grados/s)")]
+    [SerializeField] private float yawSensitivity   = 180f;
+    [SerializeField] private float pitchSensitivity = 180f;
+
+    [Header("Suavizado de rotación")]
+    [Tooltip("Cuánto tarda en alcanzar la rotación objetivo")]
+    [SerializeField] private float smoothing = 10f;
 
     [Header("Límites de inclinación vertical")]
     [SerializeField] private float minPitch = -45f;
     [SerializeField] private float maxPitch =  45f;
 
     private InputAction lookAction;
-    private float currentYaw;
-    private float currentPitch;
+    private float targetYaw;
+    private float targetPitch;
 
     private void Awake()
     {
-        // Arrancamos con la rotación inicial
+        // Inicializa los ángulos desde la rotación actual
         Vector3 e = transform.localEulerAngles;
-        currentYaw   = e.y;
-        currentPitch = e.x;
+        targetYaw   = e.y;
+        targetPitch = e.x;
 
-        // Configuro WASD o flechas
+        // Configura composite WASD o Flechas
         lookAction = new InputAction($"Look_P{playerId}", InputActionType.Value);
         var cb = lookAction.AddCompositeBinding("2DVector");
         if (playerId == 1)
@@ -45,15 +49,8 @@ public class PlayerControllerKeyboard : MonoBehaviour
         }
     }
 
-    private void OnEnable()
-    {
-        lookAction.Enable();
-    }
-
-    private void OnDisable()
-    {
-        lookAction.Disable();
-    }
+    private void OnEnable()  => lookAction.Enable();
+    private void OnDisable() => lookAction.Disable();
 
     private void Update()
     {
@@ -61,16 +58,21 @@ public class PlayerControllerKeyboard : MonoBehaviour
 
         // Yaw (izquierda/derecha)
         if (Mathf.Abs(v.x) > 0.01f)
-            currentYaw += v.x * yawSpeed * Time.deltaTime;
+            targetYaw += v.x * yawSensitivity * Time.deltaTime;
 
-        // Pitch (arriba/abajo)
+        // Pitch (arriba/abajo), invertido para W/↑ = mirar arriba
         if (Mathf.Abs(v.y) > 0.01f)
         {
-            currentPitch += v.y * pitchSpeed * Time.deltaTime;
-            currentPitch = Mathf.Clamp(currentPitch, minPitch, maxPitch);
+            targetPitch -= v.y * pitchSensitivity * Time.deltaTime;
+            targetPitch = Mathf.Clamp(targetPitch, minPitch, maxPitch);
         }
 
-        // Aplico rotación local a la cámara
-        transform.localRotation = Quaternion.Euler(currentPitch, currentYaw, 0f);
+        // Rotación suave hacia el objetivo
+        Quaternion goal = Quaternion.Euler(targetPitch, targetYaw, 0f);
+        transform.localRotation = Quaternion.Slerp(
+            transform.localRotation,
+            goal,
+            smoothing * Time.deltaTime
+        );
     }
 }
